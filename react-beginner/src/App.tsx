@@ -1,33 +1,12 @@
-import AddTodoForm from "./component/AddTodoForm";
-import TodoList from "./component/TodoList";
-import TodoSummary from "./component/TodoSummary";
-import useTodos from "./hooks/useTodos";
+// import Form1 from "./component/forms/Form1";
+import FormLoad1 from "./component/forms/FormLoad1";
 
 function App() {
-  const {
-    todos,
-    addTodo,
-    setTodoCompleted,
-    deleteTodo,
-    deleteAllCompletedTodos,
-  } = useTodos();
-
   return (
-    <main className="py-10 h-screen space-y-5 overflow-y-auto">
-      <h1 className="font-bold text-3xl text-center">To Do List</h1>
-      <div className="max-w-lg mx-auto bg-slate-100 rounded-md p-5 space-y-6">
-        <AddTodoForm onSubmit={addTodo} />
-        <TodoList
-          todos={todos}
-          onCompletedChange={setTodoCompleted}
-          onDelete={deleteTodo}
-        />
-        <TodoSummary
-          todos={todos}
-          deleteAllCompleted={deleteAllCompletedTodos}
-        />
-      </div>
-    </main>
+    <div className="p-6">
+      {/* <Form1 /> */}
+      <FormLoad1 />
+    </div>
   );
 }
 
