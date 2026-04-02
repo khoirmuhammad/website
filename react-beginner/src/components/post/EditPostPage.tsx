@@ -5,6 +5,7 @@ import type { FormEvent } from "react";
 import { useUpdatePost } from "../../hooks/post/usePostMutations";
 
 export default function EditPostPage() {
+  // get route param id = /edit/123 → id = "123"
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
