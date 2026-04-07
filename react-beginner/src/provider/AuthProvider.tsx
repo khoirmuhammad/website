@@ -4,10 +4,12 @@ import apiClient, {
   setExpAccessToken,
   registerAuthHandlers,
 } from "../api/client";
+import { parseToken, type UserInfo } from "../utils/parseToken";
 
 type AuthContextType = {
   isAuthenticated: boolean;
   isLoading: boolean;
+  user: UserInfo | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -19,16 +21,36 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: any) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
     registerAuthHandlers(
-      () => setIsAuthenticated(true),
-      () => setIsAuthenticated(false),
+      () => {
+        setIsAuthenticated(true);
+
+        const token = sessionStorage.getItem("accessToken");
+
+        if (token) {
+          const parsed = parseToken(token);
+          setUser(parsed); // ✅ UPDATE USER AFTER REFRESH
+        }
+      },
+      () => {
+        setIsAuthenticated(false);
+        setUser(null); // ✅ CLEAR USER
+      },
     );
 
     const initAuth = async () => {
       try {
         await apiClient.get("/me");
+        // if browser reload, we still get userInfo
+        const token = sessionStorage.getItem("accessToken");
+
+        if (token) {
+          const parsed = parseToken(token);
+          setUser(parsed); // ✅ restore user
+        }
 
         setIsAuthenticated(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,6 +81,10 @@ export const AuthProvider = ({ children }: any) => {
 
     setAccessToken(res.data.accessToken);
     setExpAccessToken(res.data.exp);
+
+    const parsed = parseToken(res.data.accessToken);
+    setUser(parsed);
+
     setIsAuthenticated(true);
   };
 
@@ -66,6 +92,7 @@ export const AuthProvider = ({ children }: any) => {
     await apiClient.post("/logout");
     setAccessToken(null);
     setExpAccessToken(null);
+    setUser(null);
     setIsAuthenticated(false);
   };
 
@@ -79,7 +106,9 @@ export const AuthProvider = ({ children }: any) => {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, isLoading, user, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

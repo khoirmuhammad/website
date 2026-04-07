@@ -1,13 +1,16 @@
-// ProtectedRoute.tsx
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/auth/useAuth";
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
+  permission?: string; // include permission here
 };
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+export default function ProtectedRoute({
+  children,
+  permission,
+}: ProtectedRouteProps) {
+  const { isAuthenticated, isLoading, user } = useAuth(); // get user here
   const location = useLocation();
 
   // WAIT until auth check finished
@@ -19,9 +22,15 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
+  // Not logged in
   if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  return children;
+  // Permission check
+  if (permission && !user?.permissions.includes(permission)) {
+    return <div>403 - Forbidden</div>;
+  }
+
+  return <>{children}</>;
 }

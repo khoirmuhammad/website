@@ -11,6 +11,8 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import { useDeletePost } from "../../hooks/post/usePostMutations";
 // Prevent too many API calls when typing
 import { useDebounce } from "../../utils/debounce";
+import { PermissionComponent } from "../auth/PermissionComponent";
+import { PERMISSIONS } from "../../config/permission";
 
 export default function PostsPage() {
   const navigate = useNavigate();
@@ -49,12 +51,14 @@ export default function PostsPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Posts</h1>
 
-        <Link
-          to="/create"
-          className="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition"
-        >
-          Create Post
-        </Link>
+        <PermissionComponent permission={PERMISSIONS.POST_CREATE}>
+          <Link
+            to="/create"
+            className="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition"
+          >
+            Create Post
+          </Link>
+        </PermissionComponent>
       </div>
 
       {/* Search (ALWAYS mounted) */}
@@ -98,37 +102,43 @@ export default function PostsPage() {
                     {/* Actions */}
                     <div className="flex gap-2">
                       {/* View */}
-                      <button
-                        onClick={() => navigate(`/detail/${post.id}`)}
-                        className="p-2 rounded-lg hover:bg-gray-100 transition"
-                      >
-                        <Eye className="w-4 h-4 text-green-500" />
-                      </button>
+                      <PermissionComponent permission={PERMISSIONS.POST_DETAIL}>
+                        <button
+                          onClick={() => navigate(`/detail/${post.id}`)}
+                          className="p-2 rounded-lg hover:bg-gray-100 transition"
+                        >
+                          <Eye className="w-4 h-4 text-green-500" />
+                        </button>
+                      </PermissionComponent>
 
                       {/* Edit */}
-                      <button
-                        onClick={() =>
-                          navigate(`/edit/${post.id}`, { state: post })
-                        }
-                        className="p-2 rounded-lg hover:bg-gray-100 transition"
-                      >
-                        <Pencil className="w-4 h-4 text-blue-500" />
-                      </button>
+                      <PermissionComponent permission={PERMISSIONS.POST_UPDATE}>
+                        <button
+                          onClick={() =>
+                            navigate(`/edit/${post.id}`, { state: post })
+                          }
+                          className="p-2 rounded-lg hover:bg-gray-100 transition"
+                        >
+                          <Pencil className="w-4 h-4 text-blue-500" />
+                        </button>
+                      </PermissionComponent>
 
                       {/* Delete */}
-                      <button
-                        onClick={() => {
-                          const confirmDelete = window.confirm(
-                            "Are you sure you want to delete this post?",
-                          );
-                          if (!confirmDelete) return;
+                      <PermissionComponent permission={PERMISSIONS.POST_DELETE}>
+                        <button
+                          onClick={() => {
+                            const confirmDelete = window.confirm(
+                              "Are you sure you want to delete this post?",
+                            );
+                            if (!confirmDelete) return;
 
-                          deletePost(post.id);
-                        }}
-                        className="p-2 rounded-lg hover:bg-gray-100 transition"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
+                            deletePost(post.id);
+                          }}
+                          className="p-2 rounded-lg hover:bg-gray-100 transition"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </button>
+                      </PermissionComponent>
                     </div>
                   </div>
 

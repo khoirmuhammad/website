@@ -1,8 +1,12 @@
 import { useContext } from "react";
 import { AuthContext } from "../../provider/AuthProvider"; // adjust path
+import { navItems } from "../../config/navigation"; // adjust path
+import { NavLink } from "react-router-dom";
+import { usePermission } from "../../hooks/auth/usePermission";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const auth = useContext(AuthContext);
+  const { can } = usePermission();
 
   if (!auth) return null;
 
@@ -27,6 +31,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </button>
         )}
       </header>
+
+      {/* Navigation */}
+      <nav className="flex items-center gap-6">
+        {navItems
+          .filter((item) => can(item.permission))
+          .map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `
+                  text-sm font-medium transition
+                  ${
+                    isActive
+                      ? "text-blue-600 border-b-2 border-blue-600 pb-1"
+                      : "text-gray-600 hover:text-blue-600"
+                  }
+                `
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+      </nav>
 
       <main className="flex-1 p-4">{children}</main>
     </div>

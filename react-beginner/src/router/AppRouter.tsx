@@ -7,6 +7,7 @@ import EditPostPage from "../components/post/EditPostPage";
 import DetailPostPage from "../components/post/DetailPostPage";
 import Layout from "../components/common/Layout";
 import PublicRoute from "./PublicRoute";
+import { PERMISSIONS } from "../config/permission";
 
 export default function AppRouter() {
   return (
@@ -24,7 +25,7 @@ export default function AppRouter() {
         <Route
           path="/"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute permission={PERMISSIONS.POST_READ}>
               <PostsPage />
             </ProtectedRoute>
           }
@@ -33,7 +34,7 @@ export default function AppRouter() {
         <Route
           path="/create"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute permission={PERMISSIONS.POST_CREATE}>
               <CreatePostPage />
             </ProtectedRoute>
           }
@@ -42,7 +43,7 @@ export default function AppRouter() {
         <Route
           path="/edit/:id"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute permission={PERMISSIONS.POST_UPDATE}>
               <EditPostPage />
             </ProtectedRoute>
           }
@@ -51,7 +52,7 @@ export default function AppRouter() {
         <Route
           path="/detail/:id"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute permission={PERMISSIONS.POST_DETAIL}>
               <DetailPostPage />
             </ProtectedRoute>
           }
